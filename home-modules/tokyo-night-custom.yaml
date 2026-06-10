@@ -1,0 +1,25 @@
+scheme: "Tokyo Night (Helix Base16)"
+author: "Folke Lemaitre (Ported for Helix)"
+
+# --- Backgrounds & UI ---
+base00: "1a1b26" # Default Background (Night) - ou "24283b" pour la version Storm
+base01: "1f2335" # Lighter Background (Status bar, Line numbers)
+base02: "292e42" # Selection Background (Highlight)
+base03: "414868" # Comments / Grey (UI borders, Hidden chars)
+base04: "565f89" # Dark Foreground (Status bar text, Delimiters)
+
+# --- Foregrounds (Text) ---
+base05: "c0caf5" # Default Foreground (Main Text)
+base06: "a9b1d6" # Light Foreground (Variables, Secondary text)
+base07: "c0caf5" # Light Background (Not often used, kept same as fg)
+
+# --- Colors (Syntax Highlighting) ---
+base08: "f7768e" # Red      (Variables, XML Tags, Errors)
+base09: "ff9e64" # Orange   (Integers, Booleans, Constants)
+base0A: "e0af68" # Yellow   (Classes, Keywords - sometimes)
+base0B: "9ece6a" # Green    (Strings, Git Diff Added)
+base0C: "7dcfff" # Cyan     (Regex, Escape chars, Support)
+base0D: "7aa2f7" # Blue     (Functions, Methods, Attribute IDs)
+base0E: "bb9af7" # Purple   (Keywords, Storage, Selector)
+base0F: "db4b4b" # Brown/Red(Deprecated, special chars)
+

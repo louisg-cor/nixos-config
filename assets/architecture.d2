@@ -1,0 +1,88 @@
+direction: down
+
+# --- CONFIGURATION LAYER (The Source of Truth) ---
+Configuration: {
+  style: {
+    stroke: "#3b82f6"
+    fill: "#eff6ff"
+    stroke-width: 2
+  }
+  Flakes: Nix Flakes {
+    shape: cylinder
+  }
+  HomeManager: Home Manager
+  Stylix: Stylix {
+    tooltip: "Global Theming Engine"
+  }
+}
+
+# --- SYSTEM LAYER (The Core) ---
+System: {
+  style: {
+    stroke: "#10b981"
+    fill: "#ecfdf5"
+    stroke-width: 2
+  }
+  NixOS: NixOS {
+    shape: package
+  }
+  Kernel: Linux Kernel {
+    amdgpu: amdgpu module
+    udev: udev rules
+  }
+  Storage: Btrfs + Snapper {
+    subvolumes: Subvolumes
+    snapshots: Snapshots
+  }
+}
+
+# --- INTERFACE LAYER (The Interaction) ---
+Workspace: {
+  style: {
+    stroke: "#f59e0b"
+    fill: "#fffbeb"
+    stroke-width: 2
+  }
+  Hyprland: Hyprland (Wayland)
+  Noctalia: Noctalia-shell
+}
+
+# --- TOOLCHAIN LAYER (Productivity) ---
+Tools: {
+  style: {
+    stroke: "#8b5cf6"
+    fill: "#f5f3ff"
+    stroke-width: 2
+  }
+  Editor: Helix {
+    LSP: LSP Config
+  }
+  Web: Zen Browser {
+    Vimium: Vimium-C
+    Searxng: Searxng
+  }
+  AI: llama-cpp-rocm {
+    shape: diamond
+  }
+  Knowledge: zk (Markdown)
+}
+
+# --- RELATIONSHIPS ---
+
+# Configuration drives everything
+Configuration.Flakes -> System.NixOS: Declarative Definition
+Configuration.HomeManager -> Tools: User-space Config
+Configuration.Stylix -> Workspace.Hyprland: Theming
+Configuration.Stylix -> Tools.Editor: Theming
+
+# System manages hardware and storage
+System.NixOS -> System.Kernel: Manages
+System.NixOS -> System.Storage: Orchestrates
+
+# Workspace hosts the tools
+Workspace.Hyprland -> Tools: Compositor
+Workspace.Noctalia -> Workspace.Hyprland: Overlay
+
+# Specific Engineering Links
+Tools.AI -> System.Kernel.amdgpu: ROCm Acceleration
+Tools.Knowledge -> Tools.Editor: Integrated
