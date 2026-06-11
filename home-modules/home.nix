@@ -34,7 +34,7 @@ in
     pkgs.tinymist pkgs.d2 pkgs.vivify
     pkgs.ripgrep pkgs.fzf pkgs.visidata pkgs.pandoc
     pkgs.prettier pkgs.killall pkgs.slurp pkgs.grim
-    pkgs.xsel alacritty pkgs.evremap
+    pkgs.xsel pkgs.evremap
   ];
 
   stylix.targets = {
@@ -98,6 +98,12 @@ in
   {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.alacritty =
+  {
+    enable = true;
+    package = alacritty;
   };
 
   programs.direnv =
