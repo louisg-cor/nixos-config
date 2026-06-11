@@ -1,5 +1,12 @@
-{ inputs, ... }:
-
+{ inputs, pkgs, ... }:
+let
+  nixGLIntel = inputs.nixgl.packages.${pkgs.system}.nixGLIntel;
+  noctalia = inputs.noctalia.packages.${pkgs.system}.default;
+  noctalia-wrapped = pkgs.writeShellScriptBin "noctalia-shell"
+  ''
+    exec ${nixGLIntel}/bin/nixGLIntel ${noctalia}/bin/noctalia-shell "$@"
+  '';
+in
 {
   imports = [
     inputs.noctalia.homeModules.default
@@ -8,6 +15,7 @@
   programs.noctalia-shell = {
     enable = true;
     systemd.enable = false;
+    package = noctalia-wrapped;
 
     settings = {
       settingsVersion = 23;

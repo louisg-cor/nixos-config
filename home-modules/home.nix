@@ -13,6 +13,8 @@ in
     ./music.nix
     ./syncthing.nix
     ./zk.nix
+    # ./gui/sway.nix
+    # ./gui/noctalia.nix
   ]
   ++ (lib.optionals (osConfig.networking.hostName == "nixos-hypr") 
   [
@@ -40,6 +42,7 @@ in
   stylix.targets = {
     helix.enable = false;
     hyprland.enable = false;
+    sway.enable = false;
     kde.enable = false; # should not be enabled on ubuntu 22.04.05
     zen-browser.enable = false;
   };
