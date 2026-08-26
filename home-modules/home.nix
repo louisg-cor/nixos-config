@@ -13,6 +13,7 @@ in
     ./music.nix
     ./syncthing.nix
     ./zk.nix
+    ./evremap.nix
     # ./gui/sway.nix
     # ./gui/noctalia.nix
   ]
@@ -36,7 +37,7 @@ in
     pkgs.tinymist pkgs.d2 pkgs.vivify
     pkgs.ripgrep pkgs.fzf pkgs.visidata pkgs.pandoc
     pkgs.prettier pkgs.killall pkgs.slurp pkgs.grim
-    pkgs.xsel pkgs.evremap
+    pkgs.xsel pkgs.evremap pkgs.hx-lsp
   ];
 
   stylix.targets = {

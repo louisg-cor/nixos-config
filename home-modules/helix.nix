@@ -102,10 +102,29 @@
 
     languages =
     {
+      language-server.hx-lsp =
+      {
+        command = "hx-lsp";
+      };
       language-server.zk =
       {
         command = "zk";
         args = ["lsp"];
+      };
+      language-server.pyright =
+      {
+        command = "pyright-langserver";
+        args = ["--stdio"];
+      };
+      language-server.clangd =
+      {
+        command = "clangd";
+        args = ["--header-insertion=never"];
+      };
+      language-server.ruff =
+      {
+        command = "ruff";
+        args = ["server"];
       };
       language =
       [
@@ -121,14 +140,34 @@
         }
         {
           name = "cpp";
-          language-servers = ["clangd"];
+          language-servers = [ "clangd" "hx-lsp" ];
           auto-format = true;
           formatter =
           {
             command = "clang-format";
           };
         }
+        {
+          name = "cmake";
+          auto-format = true;
+          formatter =
+          {
+            command = "gersemi";
+            args = ["-"];
+          };
+        }
+        {
+          name = "python";
+          language-servers = [ "pyright" "ruff" ];
+          auto-format = true;
+          formatter =
+          {
+            command = "ruff";
+            args = ["format" "-"];
+          };
+        }
       ];
     };
   };
+  xdg.configFile."helix/snippets/cpp.json".source = ./snippets/cpp.json;
 }

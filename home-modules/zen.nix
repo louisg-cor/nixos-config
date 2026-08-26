@@ -29,10 +29,10 @@ in
     ./vimium-c.nix
   ];
 
-  # home.file.".zen/lgalloux/zen-keyboard-shortcuts.json" =
-  # {
-  #   source = ./zen-shortcuts.json;
-  # };
+  home.file.".zen/lgalloux/zen-keyboard-shortcuts.json" =
+  {
+    source = ./zen-shortcuts.json;
+  };
 
   xdg.mimeApps =
   {
