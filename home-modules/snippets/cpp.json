@@ -1,6 +1,6 @@
 {
   "doxygen_func": {
-    "prefix": "dox",
+    "prefix": "dox_func",
     "body": [
       "/**",
       " * @brief ${1:Résumé court}",
@@ -11,24 +11,20 @@
     ],
     "description": "Bloc Doxygen pour une fonction"
   },
-  "doxygen_file": {
-    "prefix": "doxfile",
+  "doxygen_struct": {
+    "prefix": "dox_struct",
     "body": [
       "/**",
-      " * @file ${1:${TM_FILENAME}}",
-      " * @brief ${2:Description du fichier}",
-      " * @author ${3:Auteur}",
-      " * @date ${4:$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE}",
-      " */",
-      "$0"
-    ],
-    "description": "En-tête de fichier Doxygen"
+      " * @brief ${1:short explanation}",
+      " *",
+      " * @details ${4:more details}",
+      " */"
+    ]
   },
-  "doxygen_brief": {
-    "prefix": "doxb",
+  "doxygen_member": {
+    "prefix": "dox_member",
     "body": [
-      "/** @brief ${1:description} */$0"
-    ],
-    "description": "Doxygen brief sur une ligne"
+      "///< explanation"
+    ]
   }
 }
