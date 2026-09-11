@@ -92,6 +92,7 @@ in
         "svg.context-properties.content.enabled" = true;
         "gfx.webrender.all" = true;
         "ui.systemUsesDarkTheme" = true;
+        "widget.wayland.disabled" = true;
       };
 
       extensions.packages = with pkgs.nur.repos.rycee.firefox-addons;

@@ -8,7 +8,9 @@ let
     src = inputs.blissify-rs-src;
     cargoHash = "sha256-ShStjDSeXCSLU1u2SkAS3HCeRDAOpvNH71Sm/787RM0=";
     nativeBuildInputs = [ pkgs.pkg-config pkgs.llvmPackages.libclang ];
-    buildInputs = [ pkgs.ffmpeg pkgs.sqlite pkgs.alsa-lib ];
+    # ffmpeg 8.1 ajoute AV_PKT_DATA_EXIF, que ffmpeg-next 8.0.0 (via bliss-audio)
+    # ne gere pas encore -> on reste sur ffmpeg 7.
+    buildInputs = [ pkgs.ffmpeg_7 pkgs.sqlite pkgs.alsa-lib ];
     LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
 
     BINDGEN_EXTRA_CLANG_ARGS = 
@@ -24,7 +26,7 @@ in
   home.packages = [
     pkgs.picard
     pkgs.chromaprint
-    pkgs.opusTools
+    pkgs.opus-tools
     pkgs.cava
     blissify-rs
   ];

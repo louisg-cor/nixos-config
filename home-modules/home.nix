@@ -1,9 +1,19 @@
 {  pkgs, config, pkgs-unstable, inputs, osConfig, lib, ...}:
 let
   nixGLIntel = inputs.nixgl.packages.${pkgs.system}.nixGLIntel;
-  alacritty = pkgs.writeShellScriptBin "alacritty" ''
-    exec ${nixGLIntel}/bin/nixGLIntel ${pkgs.alacritty}/bin/alacritty "$@"
-  '';
+  alacritty = pkgs.symlinkJoin
+  {
+    name = "alacritty-nixgl";
+    paths = [ pkgs.alacritty ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      rm -f $out/bin/alacritty
+      makeWrapper ${nixGLIntel}/bin/nixGLIntel $out/bin/alacritty \
+        --add-flags ${pkgs.alacritty}/bin/alacritty \
+        --set LIBGL_ALWAYS_SOFTWARE 1 \
+        --unset WAYLAND_DISPLAY
+    '';
+  };
 in
 {
   imports =
@@ -14,6 +24,7 @@ in
     ./syncthing.nix
     ./zk.nix
     ./evremap.nix
+    ./open-code.nix
     # ./gui/sway.nix
     # ./gui/noctalia.nix
   ]
@@ -104,6 +115,11 @@ in
     enableZshIntegration = true;
   };
 
+  programs.zellij =
+  {
+    enable = true;
+  };
+
   programs.alacritty =
   {
     enable = true;
@@ -176,6 +192,10 @@ in
   {
     username = "lgalloux";
     homeDirectory = "/home/lgalloux";
+    sessionVariables =
+    {
+      PROJECT="/mnt/c/msys64/home/LouisGalloux/projects/windows_usb_userspace";
+    };
     stateVersion = "25.11";
     sessionPath =
     [
