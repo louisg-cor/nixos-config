@@ -188,6 +188,10 @@ in
 
   targets.genericLinux.enable = true;
 
+  # Rend config.lib.nixGL.wrap operationnel (sinon c'est un no-op). Le wrapper
+  # par defaut est "mesa" = nixGLIntel, le meme que celui utilise pour alacritty.
+  targets.genericLinux.nixGL.packages = inputs.nixgl.packages;
+
   home =
   {
     username = "lgalloux";

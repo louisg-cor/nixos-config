@@ -27,12 +27,8 @@ in
   [
     inputs.zen-browser.homeModules.twilight
     ./vimium-c.nix
+    ./zen-shortcuts.nix
   ];
-
-  home.file.".zen/lgalloux/zen-keyboard-shortcuts.json" =
-  {
-    source = ./zen-shortcuts.json;
-  };
 
   xdg.mimeApps =
   {
@@ -50,6 +46,28 @@ in
   programs.zen-browser =
   {
     enable = true;
+
+    # Indispensable hors NixOS : lance depuis le .desktop, Zen n'a pas la pile
+    # GL de nixpkgs dans son environnement, echoue a creer un contexte GL
+    # ("Failed GL context creation for WebRender"), retombe sur SWGL et plante.
+    # En CLI le probleme ne se voit pas, le shell heritant deja des variables
+    # mesa posees par le wrapper nixGL d'alacritty.
+    nixGL.enable = true;
+
+    # Force X11 : sous WSLg, lance depuis Windows, le backend Wayland rend les
+    # popups inutilisables -- impossible de cliquer dans le panneau d'une
+    # extension, entre autres. X11 (via XWayland) n'a pas le probleme.
+    #
+    # Le pref widget.wayland.disabled ne sert a rien ici : il n'existe pas cote
+    # Gecko, et le backend est choisi avant la lecture des prefs. Seul
+    # MOZ_ENABLE_WAYLAND compte, et le launcher nixpkgs fait
+    # `export MOZ_ENABLE_WAYLAND=${MOZ_ENABLE_WAYLAND-'1'}` : sans valeur
+    # explicite Zen part donc en Wayland des que WAYLAND_DISPLAY existe, ce que
+    # WSLg fournit au lancement depuis Windows mais pas dans un shell.
+    # env.* passe par makeWrapper --set sur le binaire interne, applique donc
+    # aussi bien au .desktop qu'a la ligne de commande.
+    env.MOZ_ENABLE_WAYLAND = "0";
+
     # --- Policies & Extensions ---
     policies =
      {
@@ -90,9 +108,15 @@ in
         #Others
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         "svg.context-properties.content.enabled" = true;
+        # Obligatoire sous WSLg : sans ce pref, Gecko juge le GPU non supporte et
+        # bascule sur SWGL, qui panique au demarrage de l'UI
+        # (gfx/wr/swgl/src/swgl_fns.rs:1639, "explicit panic") -> SIGSEGV ~6 s apres
+        # le lancement. Forcer WebRender evite ce chemin de repli.
         "gfx.webrender.all" = true;
         "ui.systemUsesDarkTheme" = true;
-        "widget.wayland.disabled" = true;
+        # Le choix X11/Wayland se fait via MOZ_ENABLE_WAYLAND avant la lecture
+        # des prefs : voir env.MOZ_ENABLE_WAYLAND plus haut.
+        # ("widget.wayland.disabled" n'existe pas cote Gecko, pref inerte.)
       };
 
       extensions.packages = with pkgs.nur.repos.rycee.firefox-addons;
