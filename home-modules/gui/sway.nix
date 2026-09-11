@@ -1,6 +1,6 @@
 { config, pkgs, inputs, ... }:
 let
-  nixGLIntel = inputs.nixgl.packages.${pkgs.system}.nixGLIntel;
+  nixGLIntel = inputs.nixgl.packages.${pkgs.stdenv.hostPlatform.system}.nixGLIntel;
   sway-wrapped = pkgs.writeShellScriptBin "sway" ''
     export PATH=/home/lgalloux/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
     export NIX_PATH=/nix/var/nix/profiles/per-user/lgalloux/channels

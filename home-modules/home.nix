@@ -1,6 +1,6 @@
 {  pkgs, config, pkgs-unstable, inputs, osConfig, lib, ...}:
 let
-  nixGLIntel = inputs.nixgl.packages.${pkgs.system}.nixGLIntel;
+  nixGLIntel = inputs.nixgl.packages.${pkgs.stdenv.hostPlatform.system}.nixGLIntel;
   alacritty = pkgs.symlinkJoin
   {
     name = "alacritty-nixgl";

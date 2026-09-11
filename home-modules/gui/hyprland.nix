@@ -1,4 +1,35 @@
-{ config, ... }:
+{ config, lib, ... }:
+let
+  inherit (lib.generators) mkLuaInline;
+
+  mainMod = "SUPER";
+
+  # Helpers de traduction vers l'API lua de Hyprland (hl.*).
+  # Reference : ${hyprland}/share/hypr/stubs/hl.meta.lua
+  exec = cmd: mkLuaInline ''hl.dsp.exec_cmd("${cmd}")'';
+  dsp = expr: mkLuaInline "hl.dsp.${expr}";
+
+  # hl.bind(keys, dispatcher[, opts])
+  bind = keys: dispatcher: { _args = [ keys dispatcher ]; };
+  bindRepeat = keys: dispatcher: { _args = [ keys dispatcher { repeating = true; } ]; };
+
+  # hl.env(NAME, VALUE)
+  env = name: value: { _args = [ name value ]; };
+
+  # 10 espaces de travail : touches 1..9 puis 0
+  workspaceBinds = builtins.concatLists (builtins.genList
+    (
+      x: let
+        n = x + 1;
+        key = builtins.toString (n - ((n / 10) * 10));
+      in
+      [
+        (bind "${mainMod} + ${key}" (dsp "focus({ workspace = ${toString n} })"))
+        (bind "${mainMod} + SHIFT + ${key}" (dsp "window.move({ workspace = ${toString n} })"))
+      ]
+    )
+    10);
+in
 {
   home.file.".wallpaper/tokyonight.png" =
   {
@@ -26,137 +57,146 @@
   {
     enable = true;
     xwayland.enable = true;
+
+    # hyprlang est deprecie depuis Hyprland 0.55 (le wiki ne documente plus que
+    # lua, et le code range le parseur .conf sous src/config/legacy/).
+    configType = "lua";
+
     settings =
     {
-      monitor = [ ", preferred, auto-up, 1" "DP-2, 2560x1600@144, auto, 1.33" ];
-      exec-once = "noctalia-shell";
-      env =
+      # hl.monitor({ output, mode, position, scale })
+      monitor =
       [
-        "XDG_SESSION_TYPE,wayland"
-        "XDG_CURRENT_DESKTOP,Hyprland"
-        "XDG_SESSION_DESKTOP,Hyprland"
-        "NIXOS_OZONE_WL,1"
-        "MOZ_ENABLE_WAYLAND,1"
-        "XDG_CURRENT_DESKTOP,Hyprland"
+        { output = ""; mode = "preferred"; position = "auto-up"; scale = 1; }
+        { output = "DP-2"; mode = "2560x1600@144"; position = "auto"; scale = 1.33; }
       ];
 
-      general =
-      {
-        gaps_in = 0;
-        gaps_out = 0;
-        border_size = 3;
-        "col.active_border" = "rgba(7aa2f7ee) rgba(bb9af7ee) 45deg";
-        "col.inactive_border" = "rgba(595959aa)";
-        layout = "dwindle";
-      };
+      env =
+      [
+        (env "XDG_SESSION_TYPE" "wayland")
+        (env "XDG_CURRENT_DESKTOP" "Hyprland")
+        (env "XDG_SESSION_DESKTOP" "Hyprland")
+        (env "NIXOS_OZONE_WL" "1")
+        (env "MOZ_ENABLE_WAYLAND" "1")
+      ];
 
-      decoration =
+      # Les anciennes sections hyprlang passent toutes par hl.config({ ... }).
+      config =
       {
-        rounding = 8;
-        blur =
+        general =
         {
-          enabled = true;
-          size = 3;
-          passes = 1;
+          gaps_in = 0;
+          gaps_out = 0;
+          border_size = 3;
+          col =
+          {
+            active_border =
+            {
+              colors = [ "rgba(7aa2f7ee)" "rgba(bb9af7ee)" ];
+              angle = 45;
+            };
+            inactive_border = "rgba(595959aa)";
+          };
+          layout = "dwindle";
+        };
+
+        decoration =
+        {
+          rounding = 8;
+          blur =
+          {
+            enabled = true;
+            size = 3;
+            passes = 1;
+          };
+        };
+
+        cursor =
+        {
+          no_warps = true;
+          persistent_warps = true;
+          hide_on_key_press = true;
+          inactive_timeout = 3;
+        };
+
+        input =
+        {
+          kb_layout = "us";
+          kb_variant = "altgr-intl";
+          follow_mouse = 1;
+          touchpad.natural_scroll = true;
+        };
+
+        misc =
+        {
+          disable_hyprland_logo = true;
+          disable_splash_rendering = true;
+        };
+
+        dwindle =
+        {
+          pseudotile = true;
+          preserve_split = true;
         };
       };
 
-      cursor =
-      {
-        no_warps = true;
-        persistent_warps = true;
-        hide_on_key_press = true;
-        inactive_timeout = 3;
-      };
-
-      input =
-      {
-        kb_layout = "us";
-        kb_variant = "altgr-intl";
-        follow_mouse = 1;
-        touchpad.natural_scroll = true;
-      };
-
-      misc =
-      {
-        disable_hyprland_logo = true;
-        disable_splash_rendering = true;
-      };
-
-      dwindle =
-      {
-        pseudotile = true;
-        preserve_split = true;
-      };
-
-      "$mainMod" = "SUPER";
-
       bind =
       [
-        "$mainMod, Return, exec, alacritty"
-        "$mainMod, Q, killactive"
-        "$mainMod, F, fullscreen"
-        "$mainMod, P, pseudo"
-        "$mainMod, V, togglesplit"
-        
-        "$mainMod, SPACE, exec, noctalia-shell ipc call launcher toggle"
-        "$mainMod, ESCAPE, exec, noctalia-shell ipc call lockScreen lock"
-        "$mainMod, T, exec, noctalia-shell ipc call bar toggle"
-        "$mainMod SHIFT, ESCAPE, exec, noctalia-shell ipc call sessionMenu toggle"
+        (bind "${mainMod} + Return" (exec "alacritty"))
+        (bind "${mainMod} + Q" (dsp "window.close()"))
+        (bind "${mainMod} + F" (dsp "window.fullscreen()"))
+        (bind "${mainMod} + P" (dsp "window.pseudo()"))
+        (bind "${mainMod} + V" (dsp ''layout("togglesplit")''))
 
-        "$mainMod, H, movefocus, l"
-        "$mainMod, L, movefocus, r"
-        "$mainMod, K, movefocus, u"
-        "$mainMod, J, movefocus, d"
+        (bind "${mainMod} + SPACE" (exec "noctalia-shell ipc call launcher toggle"))
+        (bind "${mainMod} + ESCAPE" (exec "noctalia-shell ipc call lockScreen lock"))
+        (bind "${mainMod} + T" (exec "noctalia-shell ipc call bar toggle"))
+        (bind "${mainMod} + SHIFT + ESCAPE" (exec "noctalia-shell ipc call sessionMenu toggle"))
 
-        "$mainMod SHIFT, H, movewindow, l"
-        "$mainMod SHIFT, L, movewindow, r"
-        "$mainMod SHIFT, K, movewindow, u"
-        "$mainMod SHIFT, J, movewindow, d"
+        (bind "${mainMod} + H" (dsp ''focus({ direction = "l" })''))
+        (bind "${mainMod} + L" (dsp ''focus({ direction = "r" })''))
+        (bind "${mainMod} + K" (dsp ''focus({ direction = "u" })''))
+        (bind "${mainMod} + J" (dsp ''focus({ direction = "d" })''))
 
-        "$mainMod, R, submap, resize"
+        (bind "${mainMod} + SHIFT + H" (dsp ''window.move({ direction = "l" })''))
+        (bind "${mainMod} + SHIFT + L" (dsp ''window.move({ direction = "r" })''))
+        (bind "${mainMod} + SHIFT + K" (dsp ''window.move({ direction = "u" })''))
+        (bind "${mainMod} + SHIFT + J" (dsp ''window.move({ direction = "d" })''))
 
-        ", XF86MonBrightnessUp, exec, noctalia-shell ipc call brightness increase"
-        ", XF86MonBrightnessDown, exec, noctalia-shell ipc call brightness decrease"
-        ", XF86AudioRaiseVolume, exec, noctalia-shell ipc call volume increase"
-        ", XF86AudioLowerVolume, exec, noctalia-shell ipc call volume decrease"
-        ", XF86AudioMute, exec, noctalia-shell ipc call volume muteOutput"
-        ", XF86AudioPlay, exec, noctalia-shell ipc call media playPause"
-        ", XF86AudioNext, exec, noctalia-shell ipc call media next"
-        ", XF86AudioPrev, exec, noctalia-shell ipc call media previous"
+        (bind "${mainMod} + R" (dsp ''submap("resize")''))
+
+        (bind "XF86MonBrightnessUp" (exec "noctalia-shell ipc call brightness increase"))
+        (bind "XF86MonBrightnessDown" (exec "noctalia-shell ipc call brightness decrease"))
+        (bind "XF86AudioRaiseVolume" (exec "noctalia-shell ipc call volume increase"))
+        (bind "XF86AudioLowerVolume" (exec "noctalia-shell ipc call volume decrease"))
+        (bind "XF86AudioMute" (exec "noctalia-shell ipc call volume muteOutput"))
+        (bind "XF86AudioPlay" (exec "noctalia-shell ipc call media playPause"))
+        (bind "XF86AudioNext" (exec "noctalia-shell ipc call media next"))
+        (bind "XF86AudioPrev" (exec "noctalia-shell ipc call media previous"))
       ]
-      ++ (builtins.concatLists (builtins.genList
-        (
-          x: let
-            ws = let c = (x + 1) / 10; in builtins.toString (x + 1 - (c * 10));
-          in
-          [
-            "$mainMod, ${ws}, workspace, ${toString (x + 1)}"
-            "$mainMod SHIFT, ${ws}, movetoworkspace, ${toString (x + 1)}"
-          ]
-        )
-        10)
-      );
+      ++ workspaceBinds;
     };
-    
+
+    # Remplace l'ancien bloc extraConfig `submap = resize ... submap = reset`.
+    # binde -> hl.bind(..., { repeating = true }).
+    # resizeactive est relatif en hyprlang, d'ou relative = true ici.
+    submaps.resize.settings.bind =
+    [
+      (bindRepeat "l" (dsp "window.resize({ x = 20, y = 0, relative = true })"))
+      (bindRepeat "h" (dsp "window.resize({ x = -20, y = 0, relative = true })"))
+      (bindRepeat "k" (dsp "window.resize({ x = 0, y = -20, relative = true })"))
+      (bindRepeat "j" (dsp "window.resize({ x = 0, y = 20, relative = true })"))
+
+      (bind "escape" (dsp ''submap("reset")''))
+      (bind "Return" (dsp ''submap("reset")''))
+      (bind "${mainMod} + R" (dsp ''submap("reset")''))
+    ];
+
+    # exec-once : en lua, on passe par le hook de demarrage.
     extraConfig = ''
-      # Définition du mode resize
-      submap = resize
-
-      # Redimensionnement Vim (HJKL)
-      # binde = répète l'action tant qu'on appuie
-      binde = , l, resizeactive, 20 0
-      binde = , h, resizeactive, -20 0
-      binde = , k, resizeactive, 0 -20
-      binde = , j, resizeactive, 0 20
-
-      # Sortie du mode
-      bind = , escape, submap, reset 
-      bind = , return, submap, reset
-      bind = SUPER, R, submap, reset # Sortir avec le même raccourci
-
-      submap = reset
+      hl.on("hyprland.start", function()
+        hl.exec_cmd("noctalia-shell")
+      end)
     '';
   };
 }
-

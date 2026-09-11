@@ -22,7 +22,7 @@
   programs =
   {
     hyprland.enable = true;
-    virt-manager = true;
+    virt-manager.enable = true;
     xwayland.enable = true;
     hyprland.xwayland.enable = true;
     steam.enable = true;

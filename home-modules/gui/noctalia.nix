@@ -1,7 +1,7 @@
 { inputs, pkgs, ... }:
 let
-  nixGLIntel = inputs.nixgl.packages.${pkgs.system}.nixGLIntel;
-  noctalia = inputs.noctalia.packages.${pkgs.system}.default;
+  nixGLIntel = inputs.nixgl.packages.${pkgs.stdenv.hostPlatform.system}.nixGLIntel;
+  noctalia = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
   noctalia-wrapped = pkgs.writeShellScriptBin "noctalia-shell"
   ''
     exec ${nixGLIntel}/bin/nixGLIntel ${noctalia}/bin/noctalia-shell "$@"
@@ -18,16 +18,17 @@ in
     package = noctalia-wrapped;
 
     settings = {
+      # Opacites (bar/capsule/panel/dock/osd/notifications) et polices :
+      # posees par stylix via modules/noctalia-shell/hm.nix, pas ici.
+      # Regler stylix.opacity.desktop / stylix.fonts dans ../../stylix.nix.
       settingsVersion = 23;
       setupCompleted = true;
 
       bar = {
         position = "top";
-        backgroundOpacity = 0.38;
         monitors = [ ];
         density = "default";
         showCapsule = true;
-        capsuleOpacity = 1;
         floating = true; 
         marginVertical = 0; 
         marginHorizontal = 0;
@@ -150,12 +151,9 @@ in
       };
 
       ui = {
-        fontDefault = "Roboto";
-        fontFixed = "DejaVu Sans Mono";
         fontDefaultScale = 1;
         fontFixedScale = 1;
         tooltipsEnabled = true;
-        panelBackgroundOpacity = 1;
         panelsAttachedToBar = true;
         settingsPanelAttachToBar = false;
       };
@@ -266,7 +264,6 @@ in
       dock = {
         enabled = false;
         displayMode = "always_visible";
-        backgroundOpacity = 0;
         floatingRatio = 0; 
         size = 1;
         onlySameOutput = true;
@@ -299,7 +296,6 @@ in
         monitors = [ ];
         location = "top_right";
         overlayLayer = true;
-        backgroundOpacity = 1;
         respectExpireTimeout = false;
         lowUrgencyDuration = 3;
         normalUrgencyDuration = 8;
@@ -313,7 +309,6 @@ in
         monitors = [ ];
         autoHideMs = 2000;
         overlayLayer = true;
-        backgroundOpacity = 1;
       };
 
       audio = {
