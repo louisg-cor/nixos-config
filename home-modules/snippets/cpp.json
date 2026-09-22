@@ -3,10 +3,11 @@
     "prefix": "dox_func",
     "body": [
       "/**",
-      " * @brief ${1:Résumé court}",
+      " * @brief ",
       " *",
-      " * @param ${2:param} ${3:description}",
-      " * @return ${4:description du retour}",
+      " * @param ",
+      " * @throw ",
+      " * @return ",
       " */"
     ],
     "description": "Bloc Doxygen pour une fonction"
@@ -15,16 +16,16 @@
     "prefix": "dox_struct",
     "body": [
       "/**",
-      " * @brief ${1:short explanation}",
+      " * @brief ",
       " *",
-      " * @details ${4:more details}",
+      " * @details ",
       " */"
     ]
   },
   "doxygen_member": {
     "prefix": "dox_member",
     "body": [
-      "///< explanation"
+      "///<"
     ]
   }
 }

@@ -19,6 +19,10 @@
     #     name = "JetBrainsMono Nerd Font Mono";
     #   };
     # };
+    fonts =
+    {
+      sizes.terminal = 15;
+    };
   };
 }
 
