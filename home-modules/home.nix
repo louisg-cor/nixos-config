@@ -143,7 +143,12 @@ in
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
-
+    initContent =
+    ''
+      claude() {
+        command claude --settings "{\"sandbox\":{\"filesystem\":{\"denyWrite\":[\"$PWD\"]}}}" "$@"
+      }
+    '';
     shellAliases =
     {
       zathura = "zathura --fork";
