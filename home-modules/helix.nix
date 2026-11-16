@@ -139,6 +139,15 @@
           };
         }
         {
+          name = "c";
+          language-servers = [ "clangd" "hx-lsp" ];
+          auto-format = true;
+          formatter =
+          {
+            command = "clang-format";
+          };
+        }
+        {
           name = "cpp";
           language-servers = [ "clangd" "hx-lsp" ];
           auto-format = true;

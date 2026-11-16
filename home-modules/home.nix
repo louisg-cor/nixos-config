@@ -76,6 +76,11 @@ in
       hyprland.default = [ "hyprland" "gtk" ];
     };
   };
+
+  xdg.configFile."gdb/gdbinit".text =
+  ''
+    add-auto-load-safe-path /home/lgalloux/projects/ethernet_poc/wiz5500_ethernet_poc/.gdbinit
+  '';
   
   programs.git =
   {

@@ -14,7 +14,7 @@ let
       device_name = "AT Translated Set 2 keyboard";
     };
     bluetooth = {
-      device_name = "MX Keys"; # à adapter
+      device_name = "MX KEYS S";
     };
   };
 
